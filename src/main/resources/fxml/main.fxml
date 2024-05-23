@@ -15,10 +15,10 @@
 
 <?import tornadofx.control.DateTimePicker?>
 
-<?import dev.xotdoge.medema.controls.LimitedTextFlow?>
+<?import dev.itltcanz.medema.controls.LimitedTextFlow?>
 
 <HBox xmlns="http://javafx.com/javafx/javafx" xmlns:fx="http://javafx.com/fxml/1"
-      fx:controller="dev.xotdoge.medema.javafx.Controller">
+      fx:controller="dev.itltcanz.medema.javafx.Controller">
     <stylesheets>
         <URL value="@style.css"/>
     </stylesheets>

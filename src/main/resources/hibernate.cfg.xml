@@ -7,7 +7,7 @@
         <property name="hbm2ddl.auto">update</property>
         <property name="show_sql">false</property>
 
-        <mapping class="dev.xotdoge.medema.entity.Module"/>
-        <mapping class="dev.xotdoge.medema.entity.Scan"/>
+        <mapping class="dev.itltcanz.medema.entity.Module"/>
+        <mapping class="dev.itltcanz.medema.entity.Scan"/>
     </session-factory>
 </hibernate-configuration>
