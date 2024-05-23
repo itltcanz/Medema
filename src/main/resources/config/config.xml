@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<launch4jConfig>
+  <dontWrapJar>false</dontWrapJar>
+  <headerType>gui</headerType>
+  <jar>C:\Perevertailo\Other\Java\Projects\Medema\target\Medema-1.0.0.jar</jar>
+  <outfile>C:\Perevertailo\Other\Java\Projects\Medema\target\Medema.exe</outfile>
+  <errTitle></errTitle>
+  <cmdLine></cmdLine>
+  <chdir>.</chdir>
+  <priority>normal</priority>
+  <downloadUrl></downloadUrl>
+  <supportUrl></supportUrl>
+  <stayAlive>false</stayAlive>
+  <restartOnCrash>true</restartOnCrash>
+  <manifest></manifest>
+  <icon>C:\Perevertailo\Other\Java\Projects\Medema\src\main\resources\image\metal-detector.ico</icon>
+  <jre>
+    <path>.\jre</path>
+    <requiresJdk>false</requiresJdk>
+    <requires64Bit>false</requires64Bit>
+    <minVersion></minVersion>
+    <maxVersion></maxVersion>
+    <opt>-XX:+UseG1GC -XX:CompileThreshold=50</opt>
+  </jre>
+</launch4jConfig>
