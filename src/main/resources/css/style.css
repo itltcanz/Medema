@@ -1,0 +1,57 @@
+.table-view, .column-header, .table-cell, label {
+  -fx-alignment: center;
+}
+
+.tab-pane {
+  -fx-padding: 0;
+}
+
+.tab-pane > .tab-header-area > .headers-region > .tab {
+  -fx-pref-width: 100;
+}
+
+.recordsContainer {
+  -fx-border-color: #d0d7de;
+  -fx-border-width: 0 1 1 0;
+  -fx-spacing: 10;
+  -fx-padding: 5 10 5 10;
+  -fx-font-size: 12;
+}
+
+.inputsContainer {
+  -fx-border-color: #d0d7de;
+  -fx-border-width: 0 1 0 0;
+  -fx-spacing: 10;
+  -fx-padding: 10 10 0 10;
+}
+
+.buttonsContainer {
+  -fx-border-color: #d0d7de;
+  -fx-border-width: 0 1 0 0;
+  -fx-spacing: 10;
+  -fx-padding: 10;
+}
+
+.statusVBoxRegion {
+  -fx-border-color: #d0d7de;
+  -fx-border-width: 0 0 3 0;
+}
+
+.detectorStatusContainer {
+  -fx-padding: 10;
+}
+
+.detectorStatus {
+  -fx-alignment: center;
+  -fx-padding: 10;
+}
+
+.LimitedTextFlowScroll {
+  -fx-border-color: #d0d7de;
+  -fx-border-width: 1 1 0 0;
+}
+
+.LimitedTextFlow {
+  -fx-padding: 10 10 0 20;
+  -fx-spacing: 10;
+}

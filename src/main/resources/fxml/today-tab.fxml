@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.Tab?>
+<?import javafx.scene.control.TableColumn?>
+<?import javafx.scene.control.TableView?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.VBox?>
+<Tab
+  xmlns="http://javafx.com/javafx/javafx"
+  xmlns:fx="http://javafx.com/fxml/1"
+  fx:controller="dev.itltcanz.medema.controller.TodayTabController"
+  closable="false"
+  text="Сегодня"
+>
+  <VBox>
+    <TableView fx:id="tableView" VBox.vgrow="ALWAYS">
+      <columns>
+        <TableColumn fx:id="idColumn" text="Модуль"/>
+        <TableColumn fx:id="locationColumn" text="Расположение"/>
+        <TableColumn fx:id="metalColumn" text="Металл"/>
+        <TableColumn fx:id="timeColumn" text="Дата и время"/>
+      </columns>
+      <columnResizePolicy>
+        <TableView fx:constant="CONSTRAINED_RESIZE_POLICY"/>
+      </columnResizePolicy>
+    </TableView>
+    <HBox styleClass="recordsContainer">
+      <Label>Записей:</Label>
+      <Label fx:id="recordsNumber"/>
+    </HBox>
+  </VBox>
+</Tab>

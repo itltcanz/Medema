@@ -1,9 +1,10 @@
 package dev.itltcanz.medema;
 
-import dev.itltcanz.medema.javafx.Application;
+import javafx.application.Application;
 
 public class Main {
-    public static void main(String[] args) {
-        Application.main(args);
-    }
+
+  public static void main(String[] args) {
+    Application.launch(MedemaApplication.class, args);
+  }
 }

@@ -1,118 +1,101 @@
 package dev.itltcanz.medema.repositories;
 
-import dev.itltcanz.medema.entity.Scan;
-import dev.itltcanz.medema.logic.Page;
-import dev.itltcanz.medema.config.HibernateUtil;
-import org.hibernate.Session;
-import org.hibernate.query.Query;
+import static dev.itltcanz.medema.util.NumberUtil.isNumber;
 
+import com.google.inject.Inject;
+import dev.itltcanz.medema.model.entity.Scan;
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.EntityManagerFactory;
+import jakarta.persistence.NoResultException;
+import jakarta.persistence.TypedQuery;
 import java.time.LocalDateTime;
 import java.util.List;
+import org.hibernate.query.Page;
 
 @SuppressWarnings("unused")
-public class ScanRepository {
-    public static void save(Scan scan) {
-        Session session = HibernateUtil.getSession();
-        session.beginTransaction();
-        session.persist(scan);
-        session.getTransaction().commit();
-        session.close();
+public class ScanRepository extends BaseRepository<Scan, Long> {
+
+  @Inject
+  public ScanRepository(EntityManagerFactory emf) {
+    super(Scan.class, emf);
+  }
+
+  public Scan findScanByTime(LocalDateTime time) {
+    try (EntityManager em = emf.createEntityManager()) {
+      return em.createQuery("SELECT s FROM Scan s WHERE s.time = :time", Scan.class)
+          .setParameter("time", time)
+          .getSingleResult();
+    } catch (NoResultException e) {
+      return null;
+    }
+  }
+
+  public boolean existsByDetectorAndTime(String detectorId, LocalDateTime time) {
+    String jpql = "SELECT COUNT(s) FROM Scan s WHERE s.detector.id = :detectorId AND s.time = :time";
+
+    try (EntityManager em = emf.createEntityManager()) {
+      Long count = em.createQuery(jpql, Long.class)
+          .setParameter("detectorId", detectorId)
+          .setParameter("time", time)
+          .getSingleResult();
+
+      return count > 0;
+    }
+  }
+
+  public List<Scan> findScansWithFilter(LocalDateTime start, LocalDateTime end,
+      String param, Page page) {
+    String jpql = createTextQuery(start, end, param);
+    return executeQuery(jpql, start, end, param, page);
+  }
+
+  private String createTextQuery(LocalDateTime start, LocalDateTime end, String param) {
+    StringBuilder jpql = new StringBuilder("SELECT s FROM Scan s WHERE 1=1");
+    if (start != null) {
+      jpql.append(" AND s.time > :start");
+    }
+    if (end != null) {
+      jpql.append(" AND s.time < :end");
     }
 
-    public static Scan findScanByTime(LocalDateTime time) {
-        Session session = HibernateUtil.getSession();
-        Query<Scan> query = session.createQuery("FROM Scan WHERE time = :time", Scan.class);
-        query.setParameter("time", time);
-        Scan scan = query.uniqueResult();
-        session.close();
-        return scan;
+    if (param != null && !param.isBlank()) {
+      jpql.append(" AND (");
+      if (isNumber(param)) {
+        jpql.append("s.metal = :paramNum)");
+      } else {
+        jpql.append("s.detector.id = :paramStr OR s.location.name = :paramStr)");
+      }
     }
+    jpql.append(" ORDER BY s.time DESC");
+    return jpql.toString();
+  }
 
-    public static Scan findScanByMetalAndTime(byte metal, LocalDateTime time) {
-        Session session = HibernateUtil.getSession();
-        Query<Scan> query = session.createQuery("FROM Scan WHERE metal = :metal AND time = :time", Scan.class);
-        query.setParameter("metal", metal);
-        query.setParameter("time", time);
-        Scan scan = query.uniqueResult();
-        session.close();
-        return scan;
-    }
+  private List<Scan> executeQuery(String jpql, LocalDateTime start, LocalDateTime end, String param,
+      Page page) {
+    try (EntityManager em = emf.createEntityManager()) {
+      TypedQuery<Scan> query = em.createQuery(jpql, Scan.class);
 
-    public static List<Scan> findScansByTimeBetweenOrderByTimeDesc(LocalDateTime start, LocalDateTime end, Page page) {
-        Session session = HibernateUtil.getSession();
-        Query<Scan> query = session.createQuery("FROM Scan WHERE time BETWEEN :start AND :end ORDER BY time DESC", Scan.class);
+      if (start != null) {
         query.setParameter("start", start);
+      }
+      if (end != null) {
         query.setParameter("end", end);
+      }
+      if (param != null && !param.isBlank()) {
+        if (isNumber(param)) {
+          query.setParameter("paramNum", Byte.valueOf(param));
+        } else {
+          query.setParameter("paramStr", param);
+        }
+      }
+
+      if (page != null) {
         query.setFirstResult(page.getNumber() * page.getSize());
         query.setMaxResults(page.getSize());
-        List<Scan> scans = query.list();
-        session.close();
-        return scans;
-    }
+      }
 
-    public static List<Scan> findScansByTimeBetweenOrderByTimeDesc(LocalDateTime start, LocalDateTime end) {
-        Session session = HibernateUtil.getSession();
-        Query<Scan> query = session.createQuery("FROM Scan WHERE time BETWEEN :start AND :end ORDER BY time DESC", Scan.class);
-        query.setParameter("start", start);
-        query.setParameter("end", end);
-        List<Scan> scans = query.list();
-        session.close();
-        return scans;
+      return query.getResultList();
     }
+  }
 
-    public static List<Scan> findAllByOrderByDateTimeDesc(Page page) {
-        Session session = HibernateUtil.getSession();
-        Query<Scan> query = session.createQuery("FROM Scan ORDER BY time DESC", Scan.class);
-        query.setFirstResult(page.getNumber() * page.getSize());
-        query.setMaxResults(page.getSize());
-        List<Scan> scans = query.list();
-        session.close();
-        return scans;
-    }
-
-    public static List<Scan> findScansByModuleIdOrModuleLocation(String id, String location) {
-        Session session = HibernateUtil.getSession();
-        Query<Scan> query = session.createQuery("FROM Scan WHERE module.id = :id OR module.location = :location", Scan.class);
-        query.setParameter("id", id);
-        query.setParameter("location", location);
-        List<Scan> scans = query.list();
-        session.close();
-        return scans;
-    }
-
-    public static List<Scan> findScansByModuleIdOrModuleLocationOrMetal(String id, String location, int metal) {
-        Session session = HibernateUtil.getSession();
-        Query<Scan> query = session.createQuery("FROM Scan WHERE module.id = :id OR module.location = :location OR metal = :metal", Scan.class);
-        query.setParameter("id", id);
-        query.setParameter("location", location);
-        query.setParameter("metal", metal);
-        List<Scan> scans = query.list();
-        session.close();
-        return scans;
-    }
-
-    public static List<Scan> findScansByModuleIdOrModuleLocationAndTimeBetween(String id, String location, LocalDateTime start, LocalDateTime end) {
-        Session session = HibernateUtil.getSession();
-        Query<Scan> query = session.createQuery("FROM Scan WHERE (module.id = :id OR module.location = :location) AND time BETWEEN :fromDateTime AND :toDateTime", Scan.class);
-        query.setParameter("id", id);
-        query.setParameter("location", location);
-        query.setParameter("start", start);
-        query.setParameter("end", end);
-        List<Scan> scans = query.list();
-        session.close();
-        return scans;
-    }
-
-    public static List<Scan> findScansByModuleIdOrModuleLocationOrMetalAndTimeBetweenOrderByTimeDesc(String id, String location, int metal, LocalDateTime start, LocalDateTime end) {
-        Session session = HibernateUtil.getSession();
-        Query<Scan> query = session.createQuery("FROM Scan WHERE (module.id = :id OR module.location = :location OR metal = :metal) AND time BETWEEN :start AND :end ORDER BY time DESC", Scan.class);
-        query.setParameter("id", id);
-        query.setParameter("location", location);
-        query.setParameter("metal", metal);
-        query.setParameter("start", start);
-        query.setParameter("end", end);
-        List<Scan> scans = query.list();
-        session.close();
-        return scans;
-    }
 }

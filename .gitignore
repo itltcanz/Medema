@@ -1,3 +1,5 @@
 .idea
-metal_detector_base.db
+*.iml
+target
+medema.db
 config.json

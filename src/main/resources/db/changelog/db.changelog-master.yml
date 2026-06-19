@@ -1,0 +1,9 @@
+databaseChangeLog:
+  - changeSet:
+      id: 001-initial
+      author: itltcanz
+      changes:
+        - sqlFile:
+            path: db/changelog/changesets/001-initial-schema.sql
+            relativeToChangelogFile: false
+            encoding: UTF-8

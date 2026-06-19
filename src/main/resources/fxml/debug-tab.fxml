@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.Tab?>
+<?import javafx.scene.control.TextArea?>
+
+<Tab
+  xmlns="http://javafx.com/javafx/javafx"
+  xmlns:fx="http://javafx.com/fxml/1"
+  fx:controller="dev.itltcanz.medema.controller.DebugTabController"
+  closable="false"
+  text="Отладка"
+>
+  <TextArea fx:id="debugArea" styleClass="LimitedTextFlow" wrapText="true" editable="false"/>
+</Tab>

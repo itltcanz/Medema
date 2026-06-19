@@ -15,6 +15,7 @@
     <java.version>21</java.version>
     <javafx.version>23</javafx.version>
     <hibernate.version>7.1.2.Final</hibernate.version>
+    <lombok.version>1.18.42</lombok.version>
     <mapstruct.version>1.6.3</mapstruct.version>
   </properties>
 
@@ -43,7 +44,7 @@
     <dependency>
       <groupId>jakarta.persistence</groupId>
       <artifactId>jakarta.persistence-api</artifactId>
-      <version>3.2.0-M2</version>
+      <version>3.2.0</version>
     </dependency>
 
     <dependency>
@@ -81,19 +82,13 @@
     <dependency>
       <groupId>org.projectlombok</groupId>
       <artifactId>lombok</artifactId>
-      <version>1.18.42</version>
+      <version>${lombok.version}</version>
     </dependency>
 
     <!-- Mapper -->
     <dependency>
       <groupId>org.mapstruct</groupId>
       <artifactId>mapstruct</artifactId>
-      <version>${mapstruct.version}</version>
-    </dependency>
-
-    <dependency>
-      <groupId>org.mapstruct</groupId>
-      <artifactId>mapstruct-processor</artifactId>
       <version>${mapstruct.version}</version>
     </dependency>
 
@@ -185,8 +180,7 @@
     <dependency>
       <groupId>org.glassfish</groupId>
       <artifactId>jakarta.el</artifactId>
-      <version>5.0.0-M1</version>
-      <scope>compile</scope>
+      <version>4.0.2</version>
     </dependency>
 
   </dependencies>
@@ -196,10 +190,31 @@
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-compiler-plugin</artifactId>
-        <version>3.10.1</version>
+        <version>3.13.0</version>
         <configuration>
           <source>${java.version}</source>
           <target>${java.version}</target>
+
+          <annotationProcessorPaths>
+            <path>
+              <groupId>org.mapstruct</groupId>
+              <artifactId>mapstruct-processor</artifactId>
+              <version>${mapstruct.version}</version>
+            </path>
+
+            <path>
+              <groupId>org.projectlombok</groupId>
+              <artifactId>lombok</artifactId>
+              <version>${lombok.version}</version>
+            </path>
+
+            <path>
+              <groupId>org.projectlombok</groupId>
+              <artifactId>lombok-mapstruct-binding</artifactId>
+              <version>0.2.0</version>
+            </path>
+          </annotationProcessorPaths>
+
         </configuration>
       </plugin>
 
@@ -218,6 +233,7 @@
         <artifactId>maven-shade-plugin</artifactId>
         <version>3.5.3</version>
         <configuration>
+          <createDependencyReducedPom>false</createDependencyReducedPom>
           <transformers>
             <transformer implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
               <mainClass>dev.itltcanz.medema.Main</mainClass>
@@ -228,6 +244,9 @@
               <artifact>*:*</artifact>
               <excludes>
                 <exclude>module-info.class</exclude>
+                <exclude>META-INF/*.SF</exclude>
+                <exclude>META-INF/*.DSA</exclude>
+                <exclude>META-INF/*.RSA</exclude>
               </excludes>
             </filter>
           </filters>

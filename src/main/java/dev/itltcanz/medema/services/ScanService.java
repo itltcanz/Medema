@@ -1,66 +1,48 @@
 package dev.itltcanz.medema.services;
 
-import dev.itltcanz.medema.entity.Module;
-import dev.itltcanz.medema.entity.Scan;
-import dev.itltcanz.medema.logic.Page;
+import dev.itltcanz.medema.model.entity.Detector;
+import dev.itltcanz.medema.model.entity.Scan;
 import dev.itltcanz.medema.repositories.ScanRepository;
-
+import dev.itltcanz.medema.util.SoundUtil;
+import jakarta.inject.Inject;
+import jakarta.persistence.EntityExistsException;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.temporal.ChronoUnit;
 import java.util.List;
+import lombok.RequiredArgsConstructor;
+import org.hibernate.query.Page;
 
-@SuppressWarnings("unused")
+@RequiredArgsConstructor(onConstructor_ = {@Inject})
 public class ScanService {
-    public static Scan createScan(String moduleId, byte metal, LocalDateTime dateTime) {
-        Module module = ModuleService.getModule(moduleId);
-        if (ScanRepository.findScanByMetalAndTime(metal, dateTime) == null) {
-            return new Scan(module, metal, dateTime);
-        }
-        return null;
+
+  private final ScanRepository scanRepository;
+
+  public void registerScan(Detector detector, byte metal) {
+    LocalDateTime time = LocalDateTime.now().truncatedTo(ChronoUnit.SECONDS);
+
+    if (scanRepository.existsByDetectorAndTime(detector.getId(), time)) {
+      throw new EntityExistsException("Скан с таким временем уже существует");
     }
 
-    public static void saveScan(Scan scan) {
-        ScanRepository.save(scan);
-    }
+    Scan scan = new Scan(detector, metal, time);
+    scanRepository.create(scan);
 
-    public static List<Scan> getScansForToday(Page page) {
-        LocalDate today = LocalDate.now();
-        LocalDateTime startOfDay = today.atStartOfDay();
-        LocalDateTime endOfDay = today.plusDays(1).atStartOfDay();
-        return ScanRepository.findScansByTimeBetweenOrderByTimeDesc(startOfDay, endOfDay, page);
+    if (metal == 1) {
+      new Thread(SoundUtil::play).start();
     }
+  }
 
-    public static List<Scan> getScansForAllTime(Page page) {
-        return ScanRepository.findAllByOrderByDateTimeDesc(page);
-    }
+  public List<Scan> findScansForToday(Page page) {
+    LocalDate today = LocalDate.now();
+    LocalDateTime start = today.atStartOfDay();
+    LocalDateTime end = today.plusDays(1).atStartOfDay();
+    return scanRepository.findScansWithFilter(start, end, null, page);
+  }
 
-    public static List<Scan> getScansInTime(LocalDateTime fromDateTime, LocalDateTime toDateTime) {
-        return ScanRepository.findScansByTimeBetweenOrderByTimeDesc(fromDateTime, toDateTime);
-    }
+  public List<Scan> findScansWithFilters(LocalDateTime start, LocalDateTime end, String param,
+      Page page) {
+    return scanRepository.findScansWithFilter(start, end, param, page);
+  }
 
-    public static List<Scan> getScansByString(String string) {
-        List<Scan> scanList;
-        try {
-            int number = Integer.parseInt(string);
-            scanList = ScanRepository.findScansByModuleIdOrModuleLocationOrMetal(string, string, number);
-        } catch (NumberFormatException e) {
-            scanList = ScanRepository.findScansByModuleIdOrModuleLocation(string, string);
-        }
-        return scanList;
-    }
-
-    public static List<Scan> getScansByParameters(LocalDateTime fromDateTime, LocalDateTime toDateTime, String string) {
-        List<Scan> scanList;
-        try {
-            int number = Integer.parseInt(string);
-            scanList = ScanRepository.findScansByModuleIdOrModuleLocationOrMetalAndTimeBetweenOrderByTimeDesc(string, string, number, fromDateTime, toDateTime);
-        } catch (NumberFormatException e) {
-            scanList = ScanRepository.findScansByModuleIdOrModuleLocationAndTimeBetween(string, string, fromDateTime, toDateTime);
-        }
-        return scanList;
-    }
-
-    public static Scan findScanByDateTime(LocalDateTime dateTime) {
-        return ScanRepository.findScanByTime(dateTime);
-    }
 }

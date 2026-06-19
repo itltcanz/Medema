@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.ScrollPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.Region?>
+<?import javafx.scene.layout.VBox?>
+
+<VBox
+  xmlns="http://javafx.com/javafx/javafx"
+  xmlns:fx="http://javafx.com/fxml/1"
+  fx:controller="dev.itltcanz.medema.controller.DetectorStatusController"
+>
+  <Region styleClass="statusVBoxRegion" minHeight="40"/>
+  <ScrollPane fitToWidth="true" HBox.hgrow="NEVER" minWidth="100">
+    <VBox fx:id="detectorStatusContainer" styleClass="detectorStatusContainer" alignment="TOP_CENTER"
+      spacing="12"/>
+  </ScrollPane>
+</VBox>
